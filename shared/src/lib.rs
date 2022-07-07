@@ -24,7 +24,14 @@ pub enum Challenge {
 
 fn serialize(message : Message) -> String {
     let json = serde_json::to_string(&message);
-    return json.unwrap();
+    match json {
+        Ok(res) => {
+            return res;
+        }
+        Err(err) => {
+            return "erreur".to_string();
+        }
+    }
 }
 
 pub fn send(stream: &mut TcpStream, message : Message){
@@ -42,10 +49,11 @@ pub fn receive(stream: &mut TcpStream) -> Vec<u8> {
             let length = u32::from_be_bytes(line) as usize;
             let mut line : Vec<u8> = vec![0u8; length];
             match stream.read_exact(&mut line) {
-                Ok(_) => {
+                Ok(res) => {
                     return line;
                 },
                 Err(e) => {
+                    println!("{}", line.len());
                     panic!("Failed to receive line: {}", e);
                 }
             }
@@ -58,21 +66,6 @@ pub fn receive(stream: &mut TcpStream) -> Vec<u8> {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Hello;
-
-impl Hello {
-    pub fn init() -> Hello {
-        return Hello;
-    }
-    pub fn to_string() -> String {
-        return serde_json::to_string(&Hello).unwrap();
-    }
-    pub fn from_str(s: &str) -> Hello {
-        if s == "Hello" {
-            return Hello::init();
-        }
-        panic!("Expected 'Hello', got '{}'", s);
-    }
-}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Welcome {

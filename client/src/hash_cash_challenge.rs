@@ -70,5 +70,5 @@ pub fn md5hashage(hashcashInput: MD5HashCashInput) -> MD5HashCashOutput {
     println!("good seed: {}", seed);
     println!("hashage: {}", result_string);
 
-    MD5HashCashOutput { seed: seedf, hashcode: result_string}
+    MD5HashCashOutput { seed: seedf, hashcode: result_string.to_string()}
 }

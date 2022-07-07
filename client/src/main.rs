@@ -28,7 +28,7 @@ fn exchange_with_server(mut stream: TcpStream) {
 
     println!("{}", from_utf8(&response).unwrap());
 
-    shared::send(&mut stream, Message::Subscribe(Subscribe { name: "wiwi".to_string() }));
+    shared::send(&mut stream, Message::Subscribe(Subscribe { name: "wiw".to_string() }));
     let response = shared::receive(&mut stream);
     println!("{}", from_utf8(&response).unwrap());
 
