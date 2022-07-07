@@ -59,6 +59,7 @@ pub fn md5hashage(hashcashInput: MD5HashCashInput) -> MD5HashCashOutput {
         } else {
             println!("pas bon la seed");
             println!("---------------");
+            seedf = get_random();
             random_hexa = to_hexa(seedf);
             seed = get_seed(random_hexa.clone());
             digest = md5::compute(seed.clone() + &hashcashInput.message);

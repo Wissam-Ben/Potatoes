@@ -4,7 +4,8 @@ mod hash_cash_challenge;
 use std::io::{Write, Read, stdin, stdout};
 use serde_json::from_str;
 use std::str::from_utf8;
-use shared::{ChallengeAnswer, ChallengeResult, Message, Subscribe, SubscribeResult, Welcome};
+use rand::Rng;
+use shared::{ChallengeAnswer, ChallengeResult, Message, PublicPlayer, Subscribe, SubscribeResult, Welcome};
 use shared::Challenge::{MD5HashCash, MonstrousMaze};
 
 
@@ -27,7 +28,7 @@ fn exchange_with_server(mut stream: TcpStream) {
 
     println!("{}", from_utf8(&response).unwrap());
 
-    shared::send(&mut stream, Message::Subscribe(Subscribe { name: "toto".to_string() }));
+    shared::send(&mut stream, Message::Subscribe(Subscribe { name: "wiwi".to_string() }));
     let response = shared::receive(&mut stream);
     println!("{}", from_utf8(&response).unwrap());
 
@@ -35,39 +36,46 @@ fn exchange_with_server(mut stream: TcpStream) {
         let response = shared::receive(&mut stream);
         let response= from_utf8(&response).unwrap();
         println!("{}", response);
-        let response = serde_json::from_str(response).unwrap();
+        let response = serde_json::from_str(response);
         match response {
-            Message::EndOfGame(..) => {
-                break;
-            }
-            Message::Challenge(response) => {
-                match response {
-                    MD5HashCash(md5_hash_cash_input) => {
-                        shared::send(&mut stream, Message::ChallengeResult(
-                            ChallengeResult {
-                                answer: ChallengeAnswer::MD5HashCash {
-                                    0: hash_cash_challenge::md5hashage(md5_hash_cash_input),
-                                },
-                                next_target: "".to_string()
-                            }
-                        ));
-                        let response = shared::receive(& mut stream);
-                        println!("{}", from_utf8(&response).unwrap());
-                    },
-                    MonstrousMaze(monstrous_maze_input) => {
-                        break;
-                    }
-                }
-            }
-            Message::SubscribeResult(res) => {
+            Ok(res) => {
                 match res {
-                    SubscribeResult::Ok => {}
-                    SubscribeResult::Err(..) => {
+                    Message::EndOfGame(..) => {
                         break;
                     }
+                    Message::Challenge(response) => {
+                        match response {
+                            MD5HashCash(md5_hash_cash_input) => {
+                                shared::send(&mut stream, Message::ChallengeResult(
+                                    ChallengeResult {
+                                        answer: ChallengeAnswer::MD5HashCash {
+                                            0: hash_cash_challenge::md5hashage(md5_hash_cash_input),
+                                        },
+                                        next_target: "".to_string()
+                                    }
+                                ));
+                                let response = shared::receive(& mut stream);
+                                println!("{}", from_utf8(&response).unwrap());
+                            },
+                            MonstrousMaze(monstrous_maze_input) => {
+                                break;
+                            }
+                        }
+                    }
+                    Message::SubscribeResult(res) => {
+                        match res {
+                            SubscribeResult::Ok => {}
+                            SubscribeResult::Err(..) => {
+                                break;
+                            }
+                        }
+                    }
+                    _ => {}
                 }
             }
-            _ => {}
+            Err(err) => {
+                println!("{}", err);
+            }
         }
         println!("Réponse du serveur : {:?}", buf);
     }
@@ -75,7 +83,7 @@ fn exchange_with_server(mut stream: TcpStream) {
 
 fn main() {
     println!("Tentative de connexion au serveur...");
-    let stream = std::net::TcpStream::connect("127.0.0.1:1234");
+    let stream = std::net::TcpStream::connect("127.0.0.1:7878");
     match stream {
         Ok(stream) => {
             println!("Connexion au serveur réussie !");
