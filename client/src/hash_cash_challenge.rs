@@ -17,8 +17,8 @@ pub fn to_hexa(value: u64) -> String {
     res
 }
 
-pub fn get_seed(randomHexa: String) -> String {
-    let mut res = randomHexa;
+pub fn get_seed(random_hexa: String) -> String {
+    let mut res = random_hexa;
     let mut zeros = "0".to_string();
     let mut count = 0;
     while res.len() + count < 15 {
@@ -30,39 +30,39 @@ pub fn get_seed(randomHexa: String) -> String {
     seed
 }
 
-pub fn countLeadingZeros(hashage:Digest) -> u32{
-    let mut leadingZeros = 0;
+pub fn count_leading_zeros(hashage: Digest) -> u32{
+    let mut leading_zeros = 0;
     for octet in hashage.as_slice() { //pour découper
 
-        leadingZeros = leadingZeros + octet.leading_zeros();
+        leading_zeros = leading_zeros + octet.leading_zeros();
         if octet.leading_zeros() < 8 {
-            println!("total leading zeros: {}", leadingZeros);
-            return leadingZeros;
+            println!("total leading zeros: {}", leading_zeros);
+            return leading_zeros;
         }
     }
 
-    println!("total leading zeros: {}", leadingZeros);
-    return leadingZeros;
+    println!("total leading zeros: {}", leading_zeros);
+    return leading_zeros;
 }
 
-pub fn md5hashage(hashcashInput: MD5HashCashInput) -> MD5HashCashOutput {
+pub fn md5hashage(hash_cash_input: MD5HashCashInput) -> MD5HashCashOutput {
 
     let mut random_hexa = to_hexa(get_random());
     let mut seed = get_seed(random_hexa);
-    let mut seedf : u64 = get_random();
+    let mut seed_final: u64 = get_random();
 
-    let mut digest = md5::compute(seed.clone() + &hashcashInput.message); //
+    let mut digest = md5::compute(seed.clone() + &hash_cash_input.message); //
 
-    while countLeadingZeros(digest) < hashcashInput.complexity  {
-        if countLeadingZeros(digest) >= hashcashInput.complexity {
+    while count_leading_zeros(digest) < hash_cash_input.complexity  {
+        if count_leading_zeros(digest) >= hash_cash_input.complexity {
             println!("ok");
         } else {
             println!("pas bon la seed");
             println!("---------------");
-            seedf = get_random();
-            random_hexa = to_hexa(seedf);
+            seed_final = get_random();
+            random_hexa = to_hexa(seed_final);
             seed = get_seed(random_hexa.clone());
-            digest = md5::compute(seed.clone() + &hashcashInput.message);
+            digest = md5::compute(seed.clone() + &hash_cash_input.message);
         }
     }
 
@@ -70,5 +70,5 @@ pub fn md5hashage(hashcashInput: MD5HashCashInput) -> MD5HashCashOutput {
     println!("good seed: {}", seed);
     println!("hashage: {}", result_string);
 
-    MD5HashCashOutput { seed: seedf, hashcode: result_string.to_string()}
+    MD5HashCashOutput { seed: seed_final, hashcode: result_string.to_string()}
 }

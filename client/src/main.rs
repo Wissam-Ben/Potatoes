@@ -5,7 +5,7 @@ use std::io::{Write, Read, stdin, stdout};
 use serde_json::from_str;
 use std::str::from_utf8;
 use rand::Rng;
-use shared::{ChallengeAnswer, ChallengeResult, Message, PublicPlayer, Subscribe, SubscribeResult};
+use shared::{ChallengeAnswer, ChallengeResult, Message, PublicLeaderBoard, PublicPlayer, Subscribe, SubscribeResult};
 use shared::Challenge::{MD5HashCash, MonstrousMaze};
 
 
@@ -35,7 +35,7 @@ fn exchange_with_server(mut stream: TcpStream) {
         }
     }
 
-    shared::send(&mut stream, Message::Subscribe(Subscribe { name: "wissssam".to_string() }));
+    shared::send(&mut stream, Message::Subscribe(Subscribe { name: "Wissm".to_string() }));
     let response = shared::receive(&mut stream);
     let res = from_utf8(&response);
     match res {
